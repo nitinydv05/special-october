@@ -59,6 +59,24 @@ function store() {
 }
 
 const router = express.Router();
+router.use((req, res, next) => {
+  if (!req.body || Object.keys(req.body).length === 0) {
+    if (req.apiGateway && req.apiGateway.event && req.apiGateway.event.body) {
+      try {
+        let raw = req.apiGateway.event.body;
+        if (req.apiGateway.event.isBase64Encoded) {
+          raw = Buffer.from(raw, "base64").toString("utf8");
+        }
+        req.body = JSON.parse(raw);
+      } catch(e) {}
+    }
+  }
+  if (typeof req.body === "string") {
+    try { req.body = JSON.parse(req.body); } catch(e) {}
+  }
+  next();
+});
+
 
 router.get("/config", (_req, res) => {
   res.json({ siteName: "October — 31 Days of You", recipient: "Nitin" });
