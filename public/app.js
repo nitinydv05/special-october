@@ -80,9 +80,14 @@ audio.addEventListener("play", resetAudioTimeout);
 audio.addEventListener("pause", expandAudio);
 
 function startAudio(){
-  audioBar.classList.remove("hidden");
-  expandAudio();
-  audio.play().catch(()=>{});
+  if (state.day === 5) {
+    audioBar.classList.remove("hidden");
+    expandAudio();
+    audio.play().catch(()=>{});
+  } else {
+    audioBar.classList.add("hidden");
+    audio.pause();
+  }
 }
 function heartBurst(){
  for(let i=0;i<12;i++){
