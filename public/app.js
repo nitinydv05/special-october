@@ -151,7 +151,10 @@ async function sendPrivate(day){
  const res=await fetch("/api/messages",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({name:"Khushi",day,message:msg,mood:state.mood})});
  const out=document.getElementById("sendResult");
  if(res.ok){out.innerHTML=`<div class="result">Delivered to your Cutie Nitin. ❤️ Now go eat something.</div>`;document.getElementById("privateMessage").value="";heartBurst();}
- else out.innerHTML=`<div class="result">Something went wrong. Please try again.</div>`;
+ else {
+   const data = await res.json().catch(()=>({}));
+   out.innerHTML=`<div class="result">${data.error || "Something went wrong. Please try again."}</div>`;
+ }
 }
 function back(){renderCalendar()}
 

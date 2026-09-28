@@ -92,7 +92,7 @@ router.post("/messages", async (req, res) => {
     res.json({ ok: true });
   } catch (e) {
     console.error(e);
-    res.status(500).json({ error: "Could not save message." });
+    res.status(500).json({ error: `Backend Error: ${e.message || String(e)}` });
   }
 });
 
