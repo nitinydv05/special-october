@@ -204,9 +204,8 @@ function day4(){return morning(4,"Khushi — User Manual","Good morning, trouble
  <p class="secret">Manufacturer’s warning: Do not underestimate her nakhre.</p><p><strong>Recommended treatment: Manao her. ❤️</strong></p></div>`+privateBox(4)+backButton();}
 
 function day5(){return morning(5,"A Song For You","For the girl whose nakhre somehow became one of my favourite things. 🎵")+
- `<div class="card center"><div class="heart">♪</div><h3>Nakhre Tere — Nikk</h3><p class="small">Your uploaded song is playing in the background.</p>
- <p class="lead">The lyric panel below is ready for lyrics you have permission to use. I have not embedded the full copyrighted lyrics in the site.</p>
- <pre id="lyrics" style="white-space:pre-wrap;text-align:left;line-height:1.8;color:#e8dfcf"></pre>
+ `<div class="card center"><div class="heart">♪</div><h3 style="margin-bottom:10px">Nakhre Tere — Nikk</h3>
+ <pre id="lyrics" style="white-space:pre-wrap;text-align:left;line-height:1.8;color:#e8dfcf;background:rgba(0,0,0,0.2);padding:20px;border-radius:12px"></pre>
  <div style="display:flex;gap:10px;justify-content:center">${btn("PLAY SONG","startAudio()","btn primary")}</div></div>`+privateBox(5)+backButton();}
 
 function day6(){const qs=[

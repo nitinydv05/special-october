@@ -83,7 +83,7 @@ router.get("/config", (_req, res) => {
 
 router.get("/lyrics", async (_req, res) => {
   try {
-    const file = await fs.readFile(path.join(ROOT, "lyrics.txt"), "utf8");
+    const file = await fs.readFile(path.join(ROOT, "public", "lyrics.txt"), "utf8");
     res.type("text/plain").send(file);
   } catch {
     res.type("text/plain").send("");
