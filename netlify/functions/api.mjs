@@ -135,9 +135,10 @@ router.post("/messages", async (req, res) => {
 });
 
 router.post("/admin/login", async (req, res) => {
+  const adminPass = process.env.ADMIN_PASSWORD || "";
   const { password } = req.body || {};
-  if (!ADMIN_PASSWORD || !safeEqual(password || "", ADMIN_PASSWORD)) {
-    return res.status(401).json({ error: "Wrong password." });
+  if (!adminPass || !safeEqual(password || "", adminPass)) {
+    return res.status(401).json({ error: `Wrong password. (Body keys: ${Object.keys(req.body || {}).join(',')}, Env length: ${adminPass.length})` });
   }
   res.json({ ok: true, token: createToken() });
 });
