@@ -2,6 +2,7 @@
   "name": "october-for-khushi",
   "version": "1.0.0",
   "private": true,
+  "type": "module",
   "description": "A private interactive October love diary for Khushi.",
   "scripts": {
     "build": "echo \"Netlify build: static site + functions\""
