@@ -7,7 +7,11 @@ function login(){
 async function doLogin(){
  const pw=document.getElementById("pw").value;
  const r=await fetch("/api/admin/login",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({password:pw})});
- if(!r.ok){document.getElementById("err").innerHTML=`<div class="result">Wrong password.</div>`;return}
+ if(!r.ok){
+   const j=await r.json().catch(()=>({}));
+   document.getElementById("err").innerHTML=`<div class="result">${j.error || "Wrong password."}</div>`;
+   return;
+ }
  const j=await r.json();token=j.token;localStorage.setItem("nitinAdminToken",token);loadInbox();
 }
 async function loadInbox(){
