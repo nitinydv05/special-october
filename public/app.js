@@ -147,9 +147,9 @@ function privateBox(day=0){
 function pickMood(el,m){ document.querySelectorAll("#moods .choice").forEach(x=>x.classList.remove("selected"));el.classList.add("selected");state.mood=m; }
 async function sendPrivate(day){
  const msg=document.getElementById("privateMessage")?.value.trim();
- if(!msg){alert("Write something first, Khushi ❤️");return}
- const res=await fetch("/api/messages",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({name:"Khushi",day,message:msg,mood:state.mood})});
  const out=document.getElementById("sendResult");
+ if(!msg){out.innerHTML=`<div class="result" style="color:var(--accent)">Write something first, Khushi ❤️</div>`;return}
+ const res=await fetch("/api/messages",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({name:"Khushi",day,message:msg,mood:state.mood})});
  if(res.ok){out.innerHTML=`<div class="result">Delivered to your Cutie Nitin. ❤️ Now go eat something.</div>`;document.getElementById("privateMessage").value="";heartBurst();}
  else {
    const data = await res.json().catch(()=>({}));
@@ -262,12 +262,22 @@ async function finalAnswer(answer){
 const dayRenderers = {1:day1,2:day2,3:day3,4:day4,5:day5,6:day6,7:day7,8:day8,9:day9,10:day10,11:day11,12:day12,13:day13,14:day14,15:day15,16:day16,17:day17,18:day18,19:day19,20:day20,21:day21,22:day22,23:day23,24:day24,25:day25,26:day26,27:day27,28:day28,29:day29,30:day30,31:day31};
 
 async function showPrivate(){
- const p = prompt("Enter the secret password to enter this space:");
- if(p !== "Nishi@11/01") {
-   alert("Incorrect password.");
-   return;
- }
- app.innerHTML=layout(`<div class="dayhead"><div class="kicker">Private Space</div><h2>Write to Nitin 🔐</h2><p class="lead">This is always available, even after October.</p></div>${privateBox(0)}<div class="center" style="margin: 30px 0;"><button class="btn secondary" onclick="viewReplies()">💌 See Nitin's Replies</button></div>${backButton()}`);
+ app.innerHTML=layout(`
+  <div class="center" style="min-height:50vh">
+    <div class="card" style="width:min(400px, 100%)">
+      <div class="kicker">RESTRICTED AREA</div>
+      <h2 style="margin-bottom:10px">Private Space 🔐</h2>
+      <p class="small" style="margin-bottom:20px;opacity:0.8">Enter the secret password to continue.</p>
+      <input type="password" id="privAuthInput" class="input" placeholder="Password" onkeydown="if(event.key==='Enter') checkPrivAuth()">
+      <div id="privAuthErr" style="color:var(--accent);display:none;margin-top:10px;font-size:0.9rem">Incorrect password.</div>
+      <div style="display:flex;gap:10px;margin-top:20px">
+        <button class="btn ghost" onclick="renderCalendar()">← BACK</button>
+        <button class="btn secondary" onclick="checkPrivAuth()">ENTER</button>
+      </div>
+    </div>
+  </div>
+ `);
+ window.scrollTo({top:0,behavior:"smooth"});
 }
 
 async function loadLyrics(){
@@ -331,3 +341,13 @@ async function viewReplies() {
     app.innerHTML = layout(`<div class="card center">Error loading replies.</div>` + backButton());
   }
 }
+
+window.checkPrivAuth = function() {
+  const p = document.getElementById("privAuthInput").value;
+  if(p !== "Nishi@11/01") {
+    document.getElementById("privAuthErr").style.display = "block";
+    return;
+  }
+  app.innerHTML=layout(`<div class="dayhead"><div class="kicker">Private Space</div><h2>Write to Nitin 🔐</h2><p class="lead">This is always available, even after October.</p></div>${privateBox(0)}<div class="center" style="margin: 30px 0;"><button class="btn secondary" onclick="viewReplies()">💌 See Nitin's Replies</button></div>${backButton()}`);
+  window.scrollTo({top:0,behavior:"smooth"});
+};

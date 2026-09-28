@@ -23,9 +23,13 @@ async function loadInbox(){
  <div class="card"><strong>${msgs.filter(x=>!x.read).length}</strong> unread · ${msgs.length} total</div>
  <div style="margin-top:15px">${msgs.length?msgs.map(m=>`<article class="admin-msg ${m.read?"":"unread"}"><div style="display:flex;justify-content:space-between;gap:10px"><strong>Khushi</strong><span class="small">Day ${m.day||"—"} · ${new Date(m.createdAt).toLocaleString()}</span></div><p class="small">Mood: ${esc(m.mood||"—")}</p><p style="white-space:pre-wrap;line-height:1.7">${esc(m.message)}</p>
  ${m.reply ? `<div style="margin-top:10px;padding:10px;background:rgba(255,255,255,0.1);border-radius:8px"><strong style="color:var(--accent)">Your reply:</strong><p style="margin-top:5px;white-space:pre-wrap">${esc(m.reply)}</p></div>` : ""}
+ <div id="reply-ui-${m.id}" style="display:none;margin-top:10px">
+  <textarea id="reply-val-${m.id}" class="input" style="min-height:80px;width:100%" placeholder="Type your reply to Khushi..."></textarea>
+  <button id="reply-btn-${m.id}" class="btn secondary" style="margin-top:8px" onclick="sendReply('${m.id}')">Send Reply</button>
+ </div>
  <div style="display:flex;gap:8px;margin-top:10px">
  ${!m.read?`<button class="btn" onclick="markRead('${m.id}')">Mark read</button>`:""}
- ${!m.reply?`<button class="btn" onclick="submitReply('${m.id}')">Reply</button>`:""}
+ ${!m.reply?`<button class="btn" onclick="document.getElementById('reply-ui-${m.id}').style.display='block'">Reply</button>`:""}
  <button class="btn" onclick="deleteMsg('${m.id}')">Delete</button></div></article>`).join(""):`<div class="card center"><div class="heart">♡</div><h3>No messages yet.</h3><p class="small">Khushi's private notes will appear here.</p></div>`}</div>`;
 }
 async function clearAll(){
@@ -33,9 +37,10 @@ async function clearAll(){
  await fetch("/api/admin/clear-all",{method:"DELETE",headers:{"x-admin-token":token}});
  loadInbox();
 }
-async function submitReply(id){
- const text=prompt("Write your reply to Khushi:");
+async function sendReply(id){
+ const text=document.getElementById(`reply-val-${id}`).value;
  if(!text)return;
+ document.getElementById(`reply-btn-${id}`).innerText="Sending...";
  await fetch("/api/admin/messages/"+id+"/reply",{method:"POST",headers:{"Content-Type":"application/json","x-admin-token":token},body:JSON.stringify({replyText:text})});
  loadInbox();
 }
