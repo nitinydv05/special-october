@@ -112,6 +112,7 @@ function intro(){
   </section>`);
 }
 function renderCalendar(){
+ history.replaceState(null, "", window.location.pathname + window.location.search);
  const progress = currentDay ? Math.min(currentDay,31) : 0;
  let cells="";
  ["SUN","MON","TUE","WED","THU","FRI","SAT"].forEach(d=>cells+=`<div class="weekday">${d}</div>`);
@@ -160,6 +161,7 @@ function back(){renderCalendar()}
 
 function openDay(day){
  state.day=day; startAudio();
+ window.location.hash = "day" + day;
  const [title,greet]=days[day];
  const renderer = dayRenderers[day] || genericDay;
  app.innerHTML=layout(renderer(day,title,greet));
@@ -307,7 +309,17 @@ function buildQuiz(){
  show();
 }
 
-intro();
+const initialHash = window.location.hash;
+if (initialHash.startsWith("#day")) {
+  const d = parseInt(initialHash.replace("#day", ""));
+  if (!isNaN(d) && d >= 1 && d <= 31 && d <= currentDay) {
+    openDay(d);
+  } else {
+    intro();
+  }
+} else {
+  intro();
+}
 
 async function viewReplies() {
   app.innerHTML = layout(`<div class="center" style="min-height:50vh"><div class="heart" style="animation:pulse 1s infinite">♡</div><p>Checking for replies...</p></div>`);
