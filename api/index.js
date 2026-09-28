@@ -137,9 +137,9 @@ router.post("/messages", async (req, res) => {
 });
 
 router.post("/admin/login", async (req, res) => {
-  const adminPass = process.env.ADMIN_PASSWORD || "";
-  const { password } = req.body || {};
-  if (!adminPass || !safeEqual(password || "", adminPass)) {
+  const adminPass = String(process.env.ADMIN_PASSWORD || "").trim();
+  const password = String((req.body && req.body.password) || "").trim();
+  if (!adminPass || !safeEqual(password, adminPass)) {
     return res.status(401).json({ error: `Wrong password. (Body keys: ${Object.keys(req.body || {}).join(',')}, Env length: ${adminPass.length})` });
   }
   res.json({ ok: true, token: createToken() });
