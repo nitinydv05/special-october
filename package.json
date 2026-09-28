@@ -1,0 +1,15 @@
+{
+  "name": "october-for-khushi",
+  "version": "1.0.0",
+  "private": true,
+  "description": "A private interactive October love diary for Khushi.",
+  "scripts": {
+    "build": "echo \"Netlify build: static site + functions\""
+  },
+  "dependencies": {
+    "@netlify/blobs": "latest",
+    "express": "^5.1.0",
+    "express-rate-limit": "^8.7.0",
+    "serverless-http": "^3.2.0"
+  }
+}
