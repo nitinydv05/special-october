@@ -186,6 +186,38 @@ router.delete("/admin/messages/:id", auth, async (req, res) => {
   }
 });
 
+router.get("/replies", async (_req, res) => {
+  try {
+    const result = [];
+    const { blobs } = await store().list({ prefix: "message/" });
+    for (const blob of blobs) {
+      const item = await store().get(blob.key, { type: "json" });
+      if (item && item.reply) result.push(item);
+    }
+    result.sort((a, b) => new Date(b.replyAt || b.createdAt) - new Date(a.replyAt || a.createdAt));
+    res.json(result);
+  } catch (e) {
+    res.status(500).json({ error: "Could not load replies." });
+  }
+});
+
+router.post("/admin/messages/:id/reply", auth, async (req, res) => {
+  try {
+    const { replyText } = req.body || {};
+    if (!replyText) return res.status(400).json({ error: "No text provided." });
+    
+    const key = `message/${req.params.id}`;
+    const item = await store().get(key, { type: "json" });
+    if (!item) return res.status(404).json({ error: "Not found" });
+    item.reply = String(replyText).trim();
+    item.replyAt = new Date().toISOString();
+    await store().setJSON(key, item);
+    res.json({ ok: true });
+  } catch (e) {
+    res.status(500).json({ error: "Could not reply." });
+  }
+});
+
 app.use("/", router);
 app.use("/api", router);
 app.use("/.netlify/functions/api", router);

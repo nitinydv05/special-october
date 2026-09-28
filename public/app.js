@@ -127,6 +127,7 @@ function renderCalendar(){
   <header class="topbar"><div><div class="kicker">A little something for my favourite person</div><h2 style="margin-bottom:0">OCTOBER 2026</h2></div><button class="btn ghost" onclick="showPrivate()">🔐 Private</button></header>
   <div class="card" style="margin-bottom:18px"><div style="display:flex;justify-content:space-between;gap:10px"><span>OUR OCTOBER</span><span>${progress}/31</span></div><div class="progress" style="margin-top:9px"><span style="width:${progress/31*100}%"></span></div></div>
   <div class="calendar">${cells}</div>
+  <div class="center" style="margin: 20px 0;"><button class="btn secondary" onclick="viewReplies()">💌 See Nitin's Replies</button></div>
   <p class="footer">31 days. Don't rush. Some things are meant to be discovered slowly. 🌙</p>
  `);
 }
@@ -293,3 +294,36 @@ function buildQuiz(){
 }
 
 intro();
+
+async function viewReplies() {
+  app.innerHTML = layout(`<div class="center" style="min-height:50vh"><div class="heart" style="animation:pulse 1s infinite">♡</div><p>Checking for replies...</p></div>`);
+  window.scrollTo({top:0,behavior:"smooth"});
+  try {
+    const res = await fetch("/api/replies");
+    const replies = await res.json();
+    if (!replies || replies.length === 0) {
+      app.innerHTML = layout(
+        `<header class="topbar"><div><div class="kicker">MESSAGES</div><h2 style="margin-bottom:0">Nitin's Replies</h2></div><button class="btn ghost" onclick="renderCalendar()">← BACK</button></header>` +
+        `<div class="card center" style="margin-top:20px"><div class="heart">♡</div><h3>No replies yet.</h3><p class="small">When Nitin writes back, it will appear here.</p></div>`
+      );
+      return;
+    }
+    const html = replies.map(m => 
+      `<div class="card" style="margin-bottom:15px">
+        <p class="small" style="opacity:0.7">You wrote (Day ${m.day}):</p>
+        <p style="white-space:pre-wrap;line-height:1.6;margin-bottom:15px">${m.message}</p>
+        <div style="background:rgba(255,255,255,0.05);padding:15px;border-radius:8px;border-left:3px solid var(--accent)">
+          <strong style="color:var(--accent)">Nitin replied:</strong>
+          <p style="margin-top:8px;white-space:pre-wrap;line-height:1.6">${m.reply}</p>
+        </div>
+      </div>`
+    ).join("");
+    
+    app.innerHTML = layout(
+      `<header class="topbar"><div><div class="kicker">MESSAGES</div><h2 style="margin-bottom:0">Nitin's Replies</h2></div><button class="btn ghost" onclick="renderCalendar()">← BACK</button></header>` +
+      `<div style="margin-top:20px">${html}</div>`
+    );
+  } catch(e) {
+    app.innerHTML = layout(`<div class="card center">Error loading replies.</div>` + backButton());
+  }
+}

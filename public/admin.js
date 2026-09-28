@@ -20,7 +20,18 @@ async function loadInbox(){
  const msgs=await r.json();
  root.innerHTML=`<div class="topbar"><div><div class="kicker">PRIVATE ADMIN</div><h2 style="margin-bottom:0">Nitin Inbox</h2></div><button class="btn ghost" onclick="logout()">LOG OUT</button></div>
  <div class="card"><strong>${msgs.filter(x=>!x.read).length}</strong> unread · ${msgs.length} total</div>
- <div style="margin-top:15px">${msgs.length?msgs.map(m=>`<article class="admin-msg ${m.read?"":"unread"}"><div style="display:flex;justify-content:space-between;gap:10px"><strong>Khushi</strong><span class="small">Day ${m.day||"—"} · ${new Date(m.createdAt).toLocaleString()}</span></div><p class="small">Mood: ${esc(m.mood||"—")}</p><p style="white-space:pre-wrap;line-height:1.7">${esc(m.message)}</p><div style="display:flex;gap:8px">${!m.read?`<button class="btn" onclick="markRead('${m.id}')">Mark read</button>`:""}<button class="btn" onclick="deleteMsg('${m.id}')">Delete</button></div></article>`).join(""):`<div class="card center"><div class="heart">♡</div><h3>No messages yet.</h3><p class="small">Khushi's private notes will appear here.</p></div>`}</div>`;
+ <div style="margin-top:15px">${msgs.length?msgs.map(m=>`<article class="admin-msg ${m.read?"":"unread"}"><div style="display:flex;justify-content:space-between;gap:10px"><strong>Khushi</strong><span class="small">Day ${m.day||"—"} · ${new Date(m.createdAt).toLocaleString()}</span></div><p class="small">Mood: ${esc(m.mood||"—")}</p><p style="white-space:pre-wrap;line-height:1.7">${esc(m.message)}</p>
+ ${m.reply ? `<div style="margin-top:10px;padding:10px;background:rgba(255,255,255,0.1);border-radius:8px"><strong style="color:var(--accent)">Your reply:</strong><p style="margin-top:5px;white-space:pre-wrap">${esc(m.reply)}</p></div>` : ""}
+ <div style="display:flex;gap:8px;margin-top:10px">
+ ${!m.read?`<button class="btn" onclick="markRead('${m.id}')">Mark read</button>`:""}
+ ${!m.reply?`<button class="btn" onclick="submitReply('${m.id}')">Reply</button>`:""}
+ <button class="btn" onclick="deleteMsg('${m.id}')">Delete</button></div></article>`).join(""):`<div class="card center"><div class="heart">♡</div><h3>No messages yet.</h3><p class="small">Khushi's private notes will appear here.</p></div>`}</div>`;
+}
+async function submitReply(id){
+ const text=prompt("Write your reply to Khushi:");
+ if(!text)return;
+ await fetch("/api/admin/messages/"+id+"/reply",{method:"POST",headers:{"Content-Type":"application/json","x-admin-token":token},body:JSON.stringify({replyText:text})});
+ loadInbox();
 }
 async function markRead(id){await fetch("/api/admin/messages/"+id+"/read",{method:"POST",headers:{"x-admin-token":token}});loadInbox();}
 async function deleteMsg(id){if(!confirm("Delete this message?"))return;await fetch("/api/admin/messages/"+id,{method:"DELETE",headers:{"x-admin-token":token}});loadInbox();}
