@@ -71,9 +71,25 @@ router.get("/lyrics", async (_req, res) => {
 
 router.post("/messages", async (req, res) => {
   try {
-    const { name, day, message, mood } = req.body || {};
+    let payload = req.body || {};
+    // Fallback for Netlify serverless-http body parsing issues
+    if ((!payload.name || !payload.message) && req.apiGateway && req.apiGateway.event && req.apiGateway.event.body) {
+      try {
+        let raw = req.apiGateway.event.body;
+        if (req.apiGateway.event.isBase64Encoded) {
+          raw = Buffer.from(raw, 'base64').toString('utf8');
+        }
+        payload = JSON.parse(raw);
+      } catch(e) {}
+    }
+    // Final fallback if body is just a string (sometimes Express does this if content-type is missing)
+    if (typeof payload === 'string') {
+      try { payload = JSON.parse(payload); } catch(e) {}
+    }
+
+    const { name, day, message, mood } = payload;
     if (!name || !message || String(message).trim().length < 1) {
-      return res.status(400).json({ error: "Name and message are required." });
+      return res.status(400).json({ error: `Name and message are required. Debug: body keys=${Object.keys(payload).join(',')}` });
     }
     if (String(name).length > 60 || String(message).length > 3000) {
       return res.status(400).json({ error: "Message is too long." });
