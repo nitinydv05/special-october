@@ -51,7 +51,11 @@ function auth(req, res, next) {
 }
 
 function store() {
-  return getStore(STORE);
+  return getStore({
+    name: STORE,
+    siteID: process.env.NETLIFY_SITE_ID,
+    token: process.env.NETLIFY_API_TOKEN
+  });
 }
 
 const router = express.Router();
