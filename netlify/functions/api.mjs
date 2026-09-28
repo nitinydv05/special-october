@@ -186,6 +186,18 @@ router.delete("/admin/messages/:id", auth, async (req, res) => {
   }
 });
 
+router.delete("/admin/clear-all", auth, async (req, res) => {
+  try {
+    const { blobs } = await store().list({ prefix: "message/" });
+    for (const blob of blobs) {
+      await store().delete(blob.key);
+    }
+    res.json({ ok: true });
+  } catch (e) {
+    res.status(500).json({ error: "Could not delete all." });
+  }
+});
+
 router.get("/replies", async (_req, res) => {
   try {
     const result = [];

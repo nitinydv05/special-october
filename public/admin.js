@@ -18,7 +18,8 @@ async function loadInbox(){
  const r=await fetch("/api/admin/messages",{headers:{"x-admin-token":token}});
  if(r.status===401){localStorage.removeItem("nitinAdminToken");token="";return login();}
  const msgs=await r.json();
- root.innerHTML=`<div class="topbar"><div><div class="kicker">PRIVATE ADMIN</div><h2 style="margin-bottom:0">Nitin Inbox</h2></div><button class="btn ghost" onclick="logout()">LOG OUT</button></div>
+ root.innerHTML=`<div class="topbar"><div><div class="kicker">PRIVATE ADMIN</div><h2 style="margin-bottom:0">Nitin Inbox</h2></div>
+ <div><button class="btn" style="margin-right:10px" onclick="clearAll()">CLEAR ALL</button><button class="btn ghost" onclick="logout()">LOG OUT</button></div></div>
  <div class="card"><strong>${msgs.filter(x=>!x.read).length}</strong> unread · ${msgs.length} total</div>
  <div style="margin-top:15px">${msgs.length?msgs.map(m=>`<article class="admin-msg ${m.read?"":"unread"}"><div style="display:flex;justify-content:space-between;gap:10px"><strong>Khushi</strong><span class="small">Day ${m.day||"—"} · ${new Date(m.createdAt).toLocaleString()}</span></div><p class="small">Mood: ${esc(m.mood||"—")}</p><p style="white-space:pre-wrap;line-height:1.7">${esc(m.message)}</p>
  ${m.reply ? `<div style="margin-top:10px;padding:10px;background:rgba(255,255,255,0.1);border-radius:8px"><strong style="color:var(--accent)">Your reply:</strong><p style="margin-top:5px;white-space:pre-wrap">${esc(m.reply)}</p></div>` : ""}
@@ -26,6 +27,11 @@ async function loadInbox(){
  ${!m.read?`<button class="btn" onclick="markRead('${m.id}')">Mark read</button>`:""}
  ${!m.reply?`<button class="btn" onclick="submitReply('${m.id}')">Reply</button>`:""}
  <button class="btn" onclick="deleteMsg('${m.id}')">Delete</button></div></article>`).join(""):`<div class="card center"><div class="heart">♡</div><h3>No messages yet.</h3><p class="small">Khushi's private notes will appear here.</p></div>`}</div>`;
+}
+async function clearAll(){
+ if(!confirm("Are you sure you want to delete EVERY message?")) return;
+ await fetch("/api/admin/clear-all",{method:"DELETE",headers:{"x-admin-token":token}});
+ loadInbox();
 }
 async function submitReply(id){
  const text=prompt("Write your reply to Khushi:");

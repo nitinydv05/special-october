@@ -127,7 +127,6 @@ function renderCalendar(){
   <header class="topbar"><div><div class="kicker">A little something for my favourite person</div><h2 style="margin-bottom:0">OCTOBER 2026</h2></div><button class="btn ghost" onclick="showPrivate()">🔐 Private</button></header>
   <div class="card" style="margin-bottom:18px"><div style="display:flex;justify-content:space-between;gap:10px"><span>OUR OCTOBER</span><span>${progress}/31</span></div><div class="progress" style="margin-top:9px"><span style="width:${progress/31*100}%"></span></div></div>
   <div class="calendar">${cells}</div>
-  <div class="center" style="margin: 20px 0;"><button class="btn secondary" onclick="viewReplies()">💌 See Nitin's Replies</button></div>
   <p class="footer">31 days. Don't rush. Some things are meant to be discovered slowly. 🌙</p>
  `);
 }
@@ -263,7 +262,12 @@ async function finalAnswer(answer){
 const dayRenderers = {1:day1,2:day2,3:day3,4:day4,5:day5,6:day6,7:day7,8:day8,9:day9,10:day10,11:day11,12:day12,13:day13,14:day14,15:day15,16:day16,17:day17,18:day18,19:day19,20:day20,21:day21,22:day22,23:day23,24:day24,25:day25,26:day26,27:day27,28:day28,29:day29,30:day30,31:day31};
 
 async function showPrivate(){
- app.innerHTML=layout(`<div class="dayhead"><div class="kicker">Private Space</div><h2>Write to Nitin 🔐</h2><p class="lead">This is always available, even after October.</p></div>${privateBox(0)}${backButton()}`);
+ const p = prompt("Enter the secret password to enter this space:");
+ if(p !== "Nishi@11/01") {
+   alert("Incorrect password.");
+   return;
+ }
+ app.innerHTML=layout(`<div class="dayhead"><div class="kicker">Private Space</div><h2>Write to Nitin 🔐</h2><p class="lead">This is always available, even after October.</p></div>${privateBox(0)}<div class="center" style="margin: 30px 0;"><button class="btn secondary" onclick="viewReplies()">💌 See Nitin's Replies</button></div>${backButton()}`);
 }
 
 async function loadLyrics(){
