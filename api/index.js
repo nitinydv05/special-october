@@ -1,9 +1,9 @@
+console.log("Booting Vercel API...");
 import express from "express";
 
 import crypto from "node:crypto";
 import fs from "node:fs/promises";
 import path from "node:path";
-import { fileURLToPath } from "node:url";
 import { getStore } from "@netlify/blobs";
 
 const app = express();
@@ -57,6 +57,11 @@ function store() {
 }
 
 const router = express.Router();
+
+router.get("/ping", (req, res) => {
+  res.json({ ok: true, message: "Vercel function is running!", env: !!process.env.NETLIFY_SITE_ID });
+});
+
 router.use((req, res, next) => {
   let b = req.body;
   if (Buffer.isBuffer(b)) b = b.toString('utf8');
@@ -232,4 +237,15 @@ app.use("/", router);
 app.use("/api", router);
 app.use("/.netlify/functions/api", router);
 
-export default app;
+app.use((req, res) => {
+  res.status(404).json({ error: "Route not found", url: req.url, originalUrl: req.originalUrl });
+});
+
+export default function handler(req, res) {
+  try {
+    return app(req, res);
+  } catch(e) {
+    console.error("Vercel Handler Crash:", e);
+    res.status(500).json({ error: "Vercel crash", details: e.message });
+  }
+}
