@@ -60,19 +60,18 @@ function store() {
 
 const router = express.Router();
 router.use((req, res, next) => {
-  if (!req.body || Object.keys(req.body).length === 0) {
+  let b = req.body;
+  if (Buffer.isBuffer(b)) b = b.toString('utf8');
+  if (typeof b === 'string') {
+    try { req.body = JSON.parse(b); } catch(e) {}
+  } else if (!b || Object.keys(b).length === 0) {
     if (req.apiGateway && req.apiGateway.event && req.apiGateway.event.body) {
       try {
         let raw = req.apiGateway.event.body;
-        if (req.apiGateway.event.isBase64Encoded) {
-          raw = Buffer.from(raw, "base64").toString("utf8");
-        }
+        if (req.apiGateway.event.isBase64Encoded) raw = Buffer.from(raw, 'base64').toString('utf8');
         req.body = JSON.parse(raw);
       } catch(e) {}
     }
-  }
-  if (typeof req.body === "string") {
-    try { req.body = JSON.parse(req.body); } catch(e) {}
   }
   next();
 });
